@@ -1,0 +1,17 @@
+/* Message */
+
+.hidden {
+    display: none;
+}
+
+.error {
+    color: red;
+    padding: 0.2em;
+    size: 14px;
+}
+
+.success {
+    color: green;
+    padding: 0.2em;
+    size: 14px;
+}
