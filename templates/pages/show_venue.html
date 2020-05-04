@@ -1,6 +1,7 @@
 {% extends 'layouts/main.html' %} {% block title %}Venue Search{% endblock %} {% block content %}
 <div class="row">
     <div class="col-sm-6">
+        <!--Details-->
         <h1 class="monospace">
             {{ venue.name }}
         </h1>
@@ -38,10 +39,19 @@
             <i class="fas fa-moon"></i> Not currently seeking talent
         </p>
         {% endif %}
+
+        <!-- actions-->
+        <div class="col-sm-6">
+            <a href="../forms/edit_venue.html"><button class="btn btn-success"><i class="fas fa-edit"></i> Edit</a></button>
+        </div>
+        <div class="col-sm-6">
+            <button data-id="{{venue.id}}" class="btn btn-danger" onclick="deleteItem(this)"><i class="fas fa-trash"></i> Delete </button>
+        </div>
     </div>
     <div class="col-sm-6">
         <img src="{{ venue.image_link }}" alt="Venue Image" />
     </div>
+
 </div>
 <section>
     <h2 class="monospace">{{ venue.upcoming_shows_count }} Upcoming {% if venue.upcoming_shows_count == 1 %}Show{% else %}Shows{% endif %}</h2>
