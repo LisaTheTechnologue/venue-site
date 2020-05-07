@@ -28,17 +28,29 @@ migrate = Migrate(app,db)
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
-
 #variable
 todays_datetime = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
+#TODO: add filter to use in detail venue page
+@app.template_filter('datetime')
+def format_datetime(value, format="%d %b %Y %I:%M %p"):
+    """Format a date time to (Default): d Mon YYYY HH:MM P"""
+    if value is None:
+        return ""
+    return value.strftime(format)
 
 # Genre models and connections
-class Genres_venue(object):    
+class Genres_venue(object):
+    """
+    Genres object the "genres" table.
+    """
     def __init__(self, genre_id, venue_id):
         self.genre_id = genre_id
         self.venue_id = venue_id
 
-class Genres_artist(object):    
+class Genres_artist(object):
+    """
+    Genres object the "genres" table.
+    """
     def __init__(self, genre_id, artist_id):
         self.genre_id = genre_id
         self.artist_id = artist_id
@@ -63,15 +75,19 @@ db.Index("genre_venue_link", genres_venue.c.venue_id, genres_venue.c.genre_id, u
 db.Index("genre_artist_link", genres_artist.c.artist_id, genres_artist.c.genre_id, unique = True)
 
 class Shows(object):
+    """
+    Shows object the "shows" table.
+    """
     def __init__(self, venue_id, artist_id):
         self.venue_id = venue_id
         self.artist_id = artist_id
 
 shows = db.Table("shows",
+        db.metadata,
         db.Column("id", db.Integer, primary_key = True),
         db.Column("venue_id", db.Integer, db.ForeignKey("venue.id")),
         db.Column("artist_id", db.Integer, db.ForeignKey("artist.id")),
-        db.Column("start_time",db.DateTime, nullable=True)
+        db.Column("start_time",db.DateTime, nullable=True, default=func.now())
         )
 
 class Venue(db.Model):
@@ -110,6 +126,9 @@ class Artist(db.Model):
             )
 
 class Genre(db.Model):
+    """
+    Genre table receives backref to "venues" when a "Venue" entry is created.
+    """
     __tablename__ = "genre"
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(64), unique=True, nullable=False)
@@ -117,6 +136,7 @@ class Genre(db.Model):
 
 db.mapper(Genres_venue, genres_venue)
 db.mapper(Genres_artist, genres_artist)
+
 db.mapper(Shows, shows)
 
 #----------------------------------------------------------------------------#
@@ -162,7 +182,7 @@ def venues():
           v1={}
           v1['id']=venue.id
           v1['name']=venue.name
-          v1['num_upcoming_shows']= db.session.query(db.func.count(shows.c.id)).filter(shows.c.start_time>todays_datetime,Venue.id==venue.id).one()
+          v1['num_upcoming_shows']= 0 #TODO: test passed but not in this app, func no attribute 'c', db.session.query(db.func.count(shows.c.id)).filter(shows.c.start_time>todays_datetime,Venue.id==venue.id).all()
           v.append(v1)
           print(v1['num_upcoming_shows'])
       d1['venues']=v
@@ -248,6 +268,9 @@ def show_venue(venue_id):
     return render_template('errors/500.html')
     # return(str(e))
 
+
+
+
 #  Create Venue
 #  ----------------------------------------------------------------
 
@@ -286,7 +309,25 @@ def create_venue_submission():
     return render_template('errors/500.html')
   finally:
     db.session.close()
+  
+@app.route('/venues/<venue_id>', methods=['DELETE'])
+#https://docs.sqlalchemy.org/en/13/orm/basic_relationships.html#deleting-rows-from-the-many-to-many-table
+def delete_venue(venue_id):
+  # TODO: Complete this endpoint for taking a venue_id, and using
+  # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
 
+  # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
+  # clicking that button delete it from the db then redirect the user to the homepage
+  flash("deleted")
+  return None
+  # try:
+  #   Venue.query.filter_by(id=venue_id).delete()
+  #   db.session.commit()
+  # except:
+  #   db.session.rollback()
+  # finally:
+  #   db.session.close()
+  # return jsonify({ 'success': True })
 
 #  Artists
 #  ----------------------------------------------------------------
@@ -587,7 +628,7 @@ def create_show_submission():
     # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
     return render_template('errors/500.html')
   
-  return render_template('pages/home.html') 
+  return render_template('pages/home.html')
 
 @app.errorhandler(404)
 def not_found_error(error):

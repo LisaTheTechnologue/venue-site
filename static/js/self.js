@@ -9,6 +9,9 @@ $("#createVenue").on("click", function(e) {
     const phone = document.getElementById('phone').value;
     const image_link = document.getElementById('image_link').value;
     const facebook_link = document.getElementById('facebook_link').value;
+    const seeking_talent = document.getElementById('seeking_talent').value;
+    const website = document.getElementById('website').value;
+    const genres = document.getElementById('genres').value;
     fetch('/venues/create', {
             method: 'POST',
             body: JSON.stringify({
@@ -18,7 +21,10 @@ $("#createVenue").on("click", function(e) {
                 'address': address,
                 'phone': phone,
                 'image_link': image_link,
-                'facebook_link': facebook_link
+                'facebook_link': facebook_link,
+                'seeking_talent': seeking_talent,
+                'website': website,
+                'genres': genres
             }),
             headers: {
                 'Content-Type': 'application/json',
