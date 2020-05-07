@@ -15,6 +15,7 @@ from forms import *
 import sys
 from flask_migrate import Migrate
 from sqlalchemy import func
+from datetime import datetime
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -28,61 +29,161 @@ migrate = Migrate(app,db)
 #----------------------------------------------------------------------------#
 # Models.
 #----------------------------------------------------------------------------#
+#variable
+todays_datetime = datetime(datetime.today().year, datetime.today().month, datetime.today().day)
 
-# shows = db.Table('shows',
-#     db.Column('venue_id', db.Integer, db.ForeignKey('Venue.id'), primary_key=True),
-#     db.Column('artist_id', db.Integer, db.ForeignKey('Artist.id'), primary_key=True),
-#     db.Column('start_time',db.DateTime) 
-# )
+# Genre models and connections
+class Genres_venue(object):
+    """
+    Genres object the "genres" table.
+    """
+    def __init__(self, genre_id, venue_id):
+        self.genre_id = genre_id
+        self.venue_id = venue_id
 
-class Shows(db.Model):
-    __tablename__ = 'shows'
+class Genres_artist(object):
+    """
+    Genres object the "genres" table.
+    """
+    def __init__(self, genre_id, artist_id):
+        self.genre_id = genre_id
+        self.artist_id = artist_id
 
-    id = db.Column('id', db.Integer, primary_key=True)
-    venue_id = db.Column(db.Integer, db.ForeignKey('Venue.id'),nullable=False)
-    artist_id = db.Column(db.Integer, db.ForeignKey('Artist.id'),nullable=False)
-    start_time = db.Column(db.DateTime, nullable=True, default=func.now())
+# "helper" table
+genres_venue = db.Table("genres_venue",
+        db.metadata,
+        db.Column("id", db.Integer, primary_key = True),
+        db.Column("genre_id", db.Integer, db.ForeignKey("genre.id"), nullable=False),
+        db.Column("venue_id", db.Integer, db.ForeignKey("venue.id"), nullable=False),
+        )
 
-    artist= db.relationship("Artist")
-    def __repr__(self):
-      return f'<Shows {self.venue_id} {self.artist_id} {self.start_time}>'
+genres_artist = db.Table("genres_artist",
+        db.metadata,
+        db.Column("id", db.Integer, primary_key = True),
+        db.Column("genre_id", db.Integer, db.ForeignKey("genre.id"), nullable=False),
+        db.Column("artist_id", db.Integer, db.ForeignKey("artist.id"), nullable=False),
+        )
+# unique index of venue_id and genre_id
+db.Index("genre_venue_link", genres_venue.c.venue_id, genres_venue.c.genre_id, unique = True)
+# unique artist_id and genre_id
+db.Index("genre_artist_link", genres_artist.c.artist_id, genres_artist.c.genre_id, unique = True)
+
+
+# show models and connections
+class Shows_venue(object):
+    """
+    Shows object the "shows" table.
+    """
+    def __init__(self, show_id, venue_id):
+        self.show_id = show_id
+        self.venue_id = venue_id
+
+class Shows_artist(object):
+    """
+    Shows object the "shows" table.
+    """
+    def __init__(self, show_id, artist_id):
+        self.show_id = show_id
+        self.artist_id = artist_id
+
+# "helper" table
+shows_venue = db.Table("shows_venue",
+        db.metadata,
+        db.Column("id", db.Integer, primary_key = True),
+        db.Column("show_id", db.Integer, db.ForeignKey("show.id"), nullable=False),
+        db.Column("venue_id", db.Integer, db.ForeignKey("venue.id"), nullable=False),
+        # db.Column("start_time",db.DateTime, nullable=True, default=func.now())
+        )
+
+shows_artist = db.Table("shows_artist",
+        db.metadata,
+        db.Column("id", db.Integer, primary_key = True),
+        db.Column("show_id", db.Integer, db.ForeignKey("show.id"), nullable=False),
+        db.Column("artist_id", db.Integer, db.ForeignKey("artist.id"), nullable=False),
+        # db.Column("start_time",db.DateTime, nullable=True, default=func.now())
+        )
+# unique index of venue_id and show_id
+db.Index("show_venue_link", shows_venue.c.venue_id, shows_venue.c.show_id, unique = True)
+# unique artist_id and show_id
+db.Index("show_artist_link", shows_artist.c.artist_id, shows_artist.c.show_id, unique = True)
+
 
 class Venue(db.Model):
-    __tablename__ = 'Venue'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
+    """
+    Venue model contains relationship to "Genre"
+    secondary table "genres" is "helper" table which contains
+    unique index of Venue.id and Genre.id
+    the backref "venues" provides a query object for Genre
+    """
+    __tablename__ = "venue"
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(64), unique=True, nullable=False)
+    city = db.Column(db.String(10), nullable=False)
+    state = db.Column(db.String(2), nullable=False)
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
-    # artists = db.relationship('Artist', secondary=shows,
-    #   backref=db.backref('venues', lazy=True))
-    #shows = db.relationship('Shows',backref=db.backref('Shows',lazy=True))
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-    def __repr__(self):
-      return f'<Venue {self.id} {self.name}>'
+    genres = db.relationship("Genre",
+            secondary=genres_venue,
+            backref=db.backref("venues", lazy="dynamic"),
+            )
+    shows = db.relationship("Show",
+            secondary=shows_venue,
+            backref=db.backref("venues", lazy="dynamic"),
+            )
 
 class Artist(db.Model):
-    __tablename__ = 'Artist'
-
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String)
-    city = db.Column(db.String(120))
-    state = db.Column(db.String(120))
+    """
+    Artist model contains relationship to "Genre"
+    secondary table "genres" is "helper" table which contains
+    unique index of Artist.id and Genre.id
+    the backref "artists" provides a query object for Genre
+    """
+    __tablename__ = "artist"
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(64), unique=True, nullable=False)
+    city = db.Column(db.String(10), nullable=False)
+    state = db.Column(db.String(2), nullable=False)
+    address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
-    genres = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
+    genres = db.relationship("Genre",
+            secondary=genres_artist,
+            backref=db.backref("artists", lazy="dynamic"),
+            )
+    shows = db.relationship("Show",
+            secondary=shows_artist,
+            backref=db.backref("artists", lazy="dynamic"),
+            )
 
-    # TODO: implement any missing fields, as a database migration using Flask-Migrate
-    def __repr__(self):
-      return f'<Artist {self.id} {self.name}>'
+class Genre(db.Model):
+    """
+    Genre table receives backref to "venues" when a "Venue" entry is created.
+    """
+    __tablename__ = "genre"
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(64), unique=True, nullable=False)
 
-# TODO Implement Show and Artist models, and complete all model relationships and properties, as a database migration.
-# look at the null condition and what is set keys : 1 venue,1 artist can have multi show dates?
+
+db.mapper(Genres_venue, genres_venue)
+db.mapper(Genres_artist, genres_artist)
+
+
+
+class Show(db.Model):
+    """
+    Show table receives backref to "venues" when a "Venue" entry is created.
+    """
+    __tablename__ = "show"
+    id = db.Column(db.Integer, primary_key = True)
+    # name = db.Column(db.String(64), unique=True, nullable=False)
+    start_time = db.Column(db.DateTime, nullable=True, default=func.now())
+
+
+db.mapper(Shows_venue, shows_venue)
+db.mapper(Shows_artist, shows_artist)
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -112,26 +213,39 @@ def index():
 
 @app.route('/venues')
 def venues():
-  # TODO: replace with real venues data.
-  #       num_shows should be aggregated based on number of upcoming shows per venue.
-    datas=db.session.query(func.count(Venue.id).label('num_id'),Venue.city,Venue.state ).group_by( Venue.city, Venue.state).all()
-    stmt = db.session.query(Shows.venue_id,func.count('*').label('num_shows_count')).filter(Shows.start_time>datetime.datetime.now()).group_by(Shows.venue_id).subquery()
-    # query= db.session.query(Venue.id,Venue.name,stmt.c.num_shows_count).outerjoin(stmt,Venue.id==stmt.c.venue_id).filter(Venue.city==data.city,Venue.state==data.state).all()
-    results = [{
-            
-                "city": data.city,
-                "state": data.state,                
-                "venues": db.session.query(Venue.id,Venue.name,stmt.c.num_shows_count).outerjoin(stmt,Venue.id==stmt.c.venue_id).filter(Venue.city==data.city,Venue.state==data.state).all()           
-                
-                } for data in datas]
-    
-    return render_template('pages/venues.html', areas=results)
+  try:        
+      citystates = db.session.query(Venue.city,Venue.state).group_by(Venue.city,Venue.state).all()
+      venues = db.session.query(Venue)
+      # upcomingshows= db.session.query(db.func.count(Show.id)).join(shows_venue).filter(Show.start_time>datetime.datetime.now())
+      d=[]
+      for citystate in citystates:
+          d1={}
+          d1['city'] = citystate.city
+          d1['state'] = citystate.state
+          venues_data = venues.filter(Venue.city==citystate.city,Venue.state==citystate.state).all()
+          d1['venues']=[]
+          v=[]
+          for venue in venues_data:                
+              v1={}
+              v1['id']=venue.id
+              v1['name']=venue.name
+              v1['num_upcoming_shows']=db.session.query(db.func.count(Show.id)).join(shows_venue).filter(Show.start_time>todays_datetime,Venue.id==venue.id).all()
+              v.append(v1)
+              print(v1['num_upcoming_shows'])
+          d1['venues']=v
+          
+          d.append(d1)
+      print(d)
+      return render_template('pages/venues.html', areas=d)
+  except Exception as error:
+      return(str(error))
 
+#TODO: edit search venue according to new schema
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
   try:
     search_term=request.form.get('search_term', '')
-    stmt = db.session.query(Shows.venue_id,func.count('*').label('num_shows_count')).filter(Shows.start_time>datetime.datetime.now()).group_by(Shows.venue_id).subquery()
+    stmt = db.session.query(shows.venue_id,func.count('*').label('num_shows_count')).filter(shows.start_time>datetime.datetime.now()).group_by(Shows.venue_id).subquery()
     query=db.session.query(Venue).filter(func.lower(Venue.name).contains(search_term.lower(), autoescape=True) )
     datas = query.all()
     response={
@@ -147,47 +261,61 @@ def search_venues():
     flash(e)
     return render_template('errors/500.html')
   
-
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
-  # shows the venue page with the given venue_id
-  # TODO: replace with real venue data from the venues table, using venue_id
   try:
+    q=db.session.query(Venue).join(shows).filter(Venue.id==venue_id).one()
+    ps=db.session.query(shows.c.artist_id).join(Venue).filter(shows.c.venue_id==venue_id,shows.c.start_time<todays_datetime).all()
+    us=db.session.query(shows.c.artist_id).join(Venue).filter(shows.c.venue_id==venue_id,shows.c.start_time>=todays_datetime).all()
+    aps = db.session.query(Artist,shows.c.start_time).filter(Artist.id.in_(ps)).join(shows).all()
+    aus = db.session.query(Artist).filter(Artist.id.in_(us)).all()
     
-    upcoming = db.session.query(Shows.venue_id,func.count('*').label('num_shows_count')).filter(Shows.start_time>datetime.datetime.now()).group_by(Shows.venue_id).subquery()
-    query=db.session.query(Venue)
-    datas = query.all()
-    results = [{      
-      {
-        "id": data.id,
-        "name": data.name,
-        "genres": ["Jazz", "Reggae", "Swing", "Classical", "Folk"],
-        "address": "1015 Folsom Street",
-        "city": "San Francisco",
-        "state": "CA",
-        "phone": "123-123-1234",
-        "website": "https://www.themusicalhop.com",
-        "facebook_link": "https://www.facebook.com/TheMusicalHop",
-        "seeking_talent": True,
-        "seeking_description": "We are on the lookout for a local artist to play every two weeks. Please call us.",
-        "image_link": "https://images.unsplash.com/photo-1543900694-133f37abaaa5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60",
-        "past_shows": [{
-          "artist_id": 4,
-          "artist_name": "Guns N Petals",
-          "artist_image_link": "https://images.unsplash.com/photo-1549213783-8284d0336c4f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=300&q=80",
-          "start_time": "2019-05-21T21:30:00.000Z"
-        }],
-        "upcoming_shows": [],
-        "past_shows_count": 1,
-        "upcoming_shows_count": 0,
-      } for data in datas
-    }]
-    #TODO: convert to a list like below by using venue_id
-    #data = list(filter(lambda d: d['id'] == venue_id, [data1, data2, data3]))[0]
-    return render_template('pages/show_venue.html', venue=data1)
+    results= {}
+    results["id"]= q.id   
+    results["name"]= q.name,
+    results["genres"]= ["Rock n Roll", "Jazz", "Classical", "Folk"], #TODO: add genres as list, lambda or forloop
+    results["address"]=q.address,
+    results["city"]= q.city,
+    results["state"]= q.state,
+    results["phone"]= q.phone,
+    # results["website"]= q.website, TODO:add website field
+    results["facebook_link"]= q.facebook_link,
+    results["seeking_talent"]= False, #TODO: need to add this field?
+    results["image_link"]= q.image_link,
+    
+    # past show
+    results["past_shows"]= []
+    print('ok')
+    l=[]
+    for pastshows in aps:                
+        v1={}
+        v1['artist_id']=pastshows.Artist.id
+        v1['artist_name']=pastshows.Artist.name
+        v1["artist_image_link"]= pastshows.Artist.image_link
+        v1['start_time']=pastshows.start_time
+        l.append(v1)
+    results["past_shows"]=l
+    results["upcoming_shows"]= []
+    l2=[]
+    for upshows in aus:                
+        v1={}
+        v1['artist_id']=upshows.id
+        v1['artist_name']=upshows.name
+        v1['start_time']=upshows.start_time
+        l2.append(v1)        
+    results["upcoming_shows"]= l2
+    results["past_shows_count"]= 1, #TODO: count properly
+    results["upcoming_shows_count"]= 2,
+    
+    return render_template('pages/show_venue.html', venue=results)
   except Exception as e:
+    # print('error')
     flash(e)
     return render_template('errors/500.html')
+    # return(str(e))
+
+
+
 
 #  Create Venue
 #  ----------------------------------------------------------------
@@ -211,6 +339,7 @@ def create_venue_submission():
     image_link = request.get_json()['image_link']
     facebook_link = request.get_json()['facebook_link']
     venue = Venue(name=name,city=city,state=state,address=address,phone=phone,image_link=image_link,facebook_link=facebook_link)
+    print('add')
     #active_list = TodoList.query.get(list_id)
     #todo.list = active_list
     db.session.add(venue)
@@ -220,24 +349,13 @@ def create_venue_submission():
     flash('Venue ' + venue.name + ' was successfully listed!')
     return jsonify(body)
   except Exception as e:
-    flash(e)
+    flash('An error occurred. Venue could not be listed.')
+    print(e)
     db.session.rollback()
     return render_template('errors/500.html')
   finally:
     db.session.close()
-  # if not error:
-  #   # on successful db insert, flash success
-  #   print("here 1")
-  #   flash('Venue ' + venue.name + ' was successfully listed!')
-    
-  # else:
-  #   print("here 2")
-  #   # TODO: on unsuccessful db insert, flash an error instead.
-  #   flash('An error occurred. Venue could not be listed.')
-  #   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
-  #   return None #render_template('errors/500.html')
   
-
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 #https://docs.sqlalchemy.org/en/13/orm/basic_relationships.html#deleting-rows-from-the-many-to-many-table
 def delete_venue(venue_id):
