@@ -1,10 +1,10 @@
-from datetime import datetime
+import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField,BooleanField
 from wtforms.validators import DataRequired, AnyOf, URL
-from app import *
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-
+from flask_sqlalchemy import SQLAlchemy
+    
 class ShowForm(FlaskForm):
     artist_id = StringField(
         'artist_id'
@@ -15,10 +15,11 @@ class ShowForm(FlaskForm):
     start_time = DateTimeField(
         'start_time',
         validators=[DataRequired()],
-        default= datetime.today()
+        default= datetime.datetime.now()
     )
 
 class VenueForm(FlaskForm):
+    
     name = StringField(
         'name', validators=[DataRequired()]
     )
@@ -90,14 +91,15 @@ class VenueForm(FlaskForm):
     image_link = StringField(
         'image_link', validators=[URL()]
     )
-    genres = QuerySelectField('genres',query_factory=lambda: Genre.query.all(),validators=[DataRequired()])
-    seeking_talent = BooleanField('seeking_talent', validators=[DataRequired()])
+    genres = SelectMultipleField('genres',choices=[])
+    seeking_talent = BooleanField('seeking_talent', default='checked',false_values=(False, 'false', '',))
     website = StringField(
         'website', validators=[URL()]
     )
     facebook_link = StringField(
         'facebook_link', validators=[URL()]
     )
+    
 
 class ArtistForm(FlaskForm):
     name = StringField(
@@ -169,7 +171,8 @@ class ArtistForm(FlaskForm):
     image_link = StringField(
         'image_link'
     )
-    genres = QuerySelectField('genres',query_factory=lambda: Genre.query.all(),validators=[DataRequired()])
+    #dynamic choices 
+    genres = SelectMultipleField('genres',choices=[])
     website = StringField(
         'website', validators=[URL()]
     )
