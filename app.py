@@ -241,11 +241,9 @@ def show_venue(venue_id):
     if(q is None):
       return render_template('errors/404.html')
     else :
-      ps=db.session.query(Show.artist_id).join(Venue).filter(Show.venue_id==venue_id,Show.start_time<todays_datetime).all()
-      us=db.session.query(Show.artist_id).join(Venue).filter(Show.venue_id==venue_id,Show.start_time>=todays_datetime).all()
-      aps = db.session.query(Show.start_time,Artist.id,Artist.name,Artist.image_link).join(Artist).filter(Artist.id.in_(ps)).all()
-      aus = db.session.query(Show.start_time,Artist.id,Artist.name,Artist.image_link).join(Artist).filter(Artist.id.in_(us)).all()
-      
+      aps = db.session.query(Show.start_time,Artist.id,Artist.name,Artist.image_link).join(Artist).filter(Show.artist_id==2,Show.start_time<todays_datetime).order_by(Show.start_time).all()
+      aus = db.session.query(Show.start_time,Artist.id,Artist.name,Artist.image_link).join(Artist).filter(Show.artist_id==2,Show.start_time>=todays_datetime).order_by(Show.start_time).all()
+
       results["id"]= q.id   
       results["name"]= q.name
       results["genres"]= [ result.name for result in db.session.query(Genre.name).join(genres_venue).filter(genres_venue.c.venue_id==venue_id).all()]
@@ -262,9 +260,9 @@ def show_venue(venue_id):
       results["past_shows"]= []
       print('ok')
       l=[]
-      upcount=0
+      pastcount=0
       for pastshows in aps:                
-        upcount =upcount+1
+        pastcount =pastcount+1
         v1={}
         v1['artist_id']=pastshows.id
         v1['artist_name']=pastshows.name
@@ -273,12 +271,14 @@ def show_venue(venue_id):
         # v1['start_time'] = v1['start_time'].dt.strftime('%Y-%m-%d %H:%M:%S')
         l.append(v1)
       results["past_shows"]=l
+
+
       # upcoming shows
       results["upcoming_shows"]= []
       l2=[]
-      pastcount=0
+      upcount=0
       for upshows in aus:                
-        pastcount = pastcount+1
+        upcount = upcount+1
         v1={}
         v1['artist_id']=upshows.id
         v1['artist_name']=upshows.name
@@ -409,11 +409,9 @@ def show_artist(artist_id):
     if(q is None):
       return render_template('errors/404.html')
     else :
-      ps=db.session.query(Show.artist_id).join(Artist).filter(Show.artist_id==artist_id,Show.start_time<todays_datetime).all()
-      us=db.session.query(Show.artist_id).join(Artist).filter(Show.artist_id==artist_id,Show.start_time>=todays_datetime).all()
-      aps = db.session.query(Artist,Show.start_time).filter(Artist.id.in_(ps)).all()
-      aus = db.session.query(Artist,Show.start_time).filter(Artist.id.in_(us)).all()     
-      
+      aps = db.session.query(Show.start_time,Venue.id,Venue.name,Venue.image_link).join(Venue).filter(Show.artist_id==artist_id,Show.start_time<todays_datetime).order_by(Show.start_time).all()
+      aus = db.session.query(Show.start_time,Venue.id,Venue.name,Venue.image_link).join(Venue).filter(Show.artist_id==artist_id,Show.start_time>=todays_datetime).order_by(Show.start_time).all()
+
       results["id"]= q.id   
       results["name"]= q.name
       results["genres"]= [ result.name for result in db.session.query(Genre.name).join(genres_artist).filter(genres_artist.c.artist_id==artist_id).all()]
@@ -430,27 +428,27 @@ def show_artist(artist_id):
       results["past_shows"]= []
       print('ok')
       l=[]
-      upcount=0
+      pastcount=0
       for pastshows in aps:                
-        upcount =upcount+1
+        pastcount =pastcount+1
         v1={}
-        v1['artist_id']=pastshows.Artist.id
-        v1['artist_name']=pastshows.Artist.name
-        v1["artist_image_link"]= pastshows.Artist.image_link
-        v1['start_time']=pastshows.start_time 
+        v1['venue_id']=pastshows.id
+        v1['venue_name']=pastshows.name
+        v1["venue_image_link"]= pastshows.image_link
+        v1['start_time']=str(pastshows.start_time )
         # v1['start_time'] = v1['start_time'].dt.strftime('%Y-%m-%d %H:%M:%S')
         l.append(v1)
       results["past_shows"]=l
       # upcoming shows
       results["upcoming_shows"]= []
       l2=[]
-      pastcount=0
+      upcount=0
       for upshows in aus:                
-        pastcount = pastcount+1
+        upcount = upcount+1
         v1={}
-        v1['artist_id']=upshows.Artist.id
-        v1['artist_name']=upshows.Artist.name
-        v1['start_time']=upshows.start_time
+        v1['venue_id']=upshows.id
+        v1['venue_name']=upshows.name
+        v1['start_time']=str(upshows.start_time)
         l2.append(v1)        
       results["upcoming_shows"]= l2
       results["past_shows_count"]= pastcount
