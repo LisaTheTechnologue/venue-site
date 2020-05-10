@@ -93,6 +93,9 @@ class VenueForm(FlaskForm):
     )
     genres = SelectMultipleField('genres',choices=[])
     seeking_talent = BooleanField('seeking_talent', default='checked',false_values=(False, 'false', '',))
+    seeking_description = StringField(
+        'seeking_description'
+    )
     website = StringField(
         'website', validators=[URL()]
     )
@@ -170,6 +173,10 @@ class ArtistForm(FlaskForm):
     )
     image_link = StringField(
         'image_link'
+    )
+    seeking_venue = BooleanField('seeking_talent', default='checked',false_values=(False, 'false', '',))
+    seeking_description = StringField(
+        'seeking_description'
     )
     #dynamic choices 
     genres = SelectMultipleField('genres',choices=[])

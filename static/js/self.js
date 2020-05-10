@@ -1,125 +1,180 @@
-$("#seeking_talent").change(function() {
-    if (this.checked) {
-        alert(this.checked)
-        this.value = true
-    } else this.value = false
-});
-//create venue
-$("#createVenue").on("click", function(e) {
-    //document.getElementById('create-venue-form').onsubmit = function(e) {
-    e.preventDefault();
-    const name = document.getElementById('name').value;
-    const city = document.getElementById('city').value;
-    const state = document.getElementById('state').value;
-    const address = document.getElementById('address').value;
-    const phone = document.getElementById('phone').value;
-    const image_link = document.getElementById('image_link').value;
-    const facebook_link = document.getElementById('facebook_link').value;
-    var seekingbox = document.getElementById('seeking_talent');
-    var seeking_talent = true;
-    if (seekingbox.checked) {
-        seeking_talent = true;
-    } else { seeking_talent = false; }
-    // alert("seeking_talent")
-    const website = document.getElementById('website').value;
-    // const genres = document.getElementById('genres').value;
-    var genres = [];
-    $("#genres :selected").each(function() {
-        genres.push($(this).val());
-    });
-    fetch('/venues/create', {
-            method: 'POST',
-            body: JSON.stringify({
-                'name': name,
-                'city': city,
-                'state': state,
-                'address': address,
-                'phone': phone,
-                'image_link': image_link,
-                'facebook_link': facebook_link,
-                'seeking_talent': seeking_talent,
-                'website': website,
-                'genres': genres
-            }),
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        })
-        // .then(response => response.json())
-        // .then(jsonResponse => {
-        //     console.log(jsonResponse);
-        // })
-        .catch(function(error) {
-            console.log(error);
-        });
-})
+// // $("#seeking_talent").change(function() {
+// //     if (this.checked) {
+// //         alert(this.checked)
+// //         this.value = true
+// //     } else this.value = false
+// // });
+// //create venue
+// // $("#createVenue").on("click", function(e) {
+// //     //document.getElementById('create-venue-form').onsubmit = function(e) {
+// //     e.preventDefault();
+// //     const name = document.getElementById('name').value;
+// //     const city = document.getElementById('city').value;
+// //     const state = document.getElementById('state').value;
+// //     const address = document.getElementById('address').value;
+// //     const phone = document.getElementById('phone').value;
+// //     const image_link = document.getElementById('image_link').value;
+// //     const facebook_link = document.getElementById('facebook_link').value;
+// //     const seeking_description = document.getElementById('seeking_description').value;
+// //     var seekingbox = document.getElementById('seeking_talent');
+// //     var seeking_talent = true;
+// //     if (seekingbox.checked) {
+// //         seeking_talent = true;
+// //     } else { seeking_talent = false; }
+// //     // alert("seeking_talent")
+// //     const website = document.getElementById('website').value;
+// //     // const genres = document.getElementById('genres').value;
+// //     var genres = [];
+// //     $("#genres :selected").each(function() {
+// //         genres.push($(this).val());
+// //     });
+// //     fetch('/venues/create', {
+// //             method: 'POST',
+// //             body: JSON.stringify({
+// //                 'name': name,
+// //                 'city': city,
+// //                 'state': state,
+// //                 'address': address,
+// //                 'phone': phone,
+// //                 'image_link': image_link,
+// //                 'facebook_link': facebook_link,
+// //                 'seeking_talent': seeking_talent,
+// //                 'seeking_description': seeking_description,
+// //                 'website': website,
+// //                 'genres': genres
+// //             }),
+// //             headers: {
+// //                 'Content-Type': 'application/json',
+// //             }
+// //         })
+// //         .catch(function(error) {
+// //             console.log(error);
+// //         });
+// // })
 
-//create artist
-// function createArtist(e) {
-//     //document.getElementById('create-artist-form').onsubmit = function(e) {
-//     e.preventDefault();
-//     const name = document.getElementById('name').value;
-//     const city = document.getElementById('city').value;
-//     const state = document.getElementById('state').value;
-//     const address = document.getElementById('address').value;
-//     const phone = document.getElementById('phone').value;
-//     const genres = document.getElementById('genres').value;
-//     const image_link = document.getElementById('image_link').value;
-//     const facebook_link = document.getElementById('facebook_link').value;
+// //create artist
+// // $("#createArtist").on("click", function(e) {
+// //     e.preventDefault();
+// //     const name = document.getElementById('name').value;
+// //     const city = document.getElementById('city').value;
+// //     const state = document.getElementById('state').value;
+// //     const address = document.getElementById('address').value;
+// //     const phone = document.getElementById('phone').value;
+// //     const image_link = document.getElementById('image_link').value;
+// //     const facebook_link = document.getElementById('facebook_link').value;
+// //     const seeking_description = document.getElementById('seeking_description').value;
+// //     var seekingbox = document.getElementById('seeking_talent');
+// //     var seeking_talent = true;
+// //     if (seekingbox.checked) {
+// //         seeking_talent = true;
+// //     } else { seeking_talent = false; }
+// //     // alert("seeking_talent")
+// //     const website = document.getElementById('website').value;
+// //     // const genres = document.getElementById('genres').value;
+// //     var genres = [];
+// //     $("#genres :selected").each(function() {
+// //         genres.push($(this).val());
+// //     });
+// //     fetch('/artists/create', {
+// //             method: 'POST',
+// //             body: JSON.stringify({
+// //                 'name': name,
+// //                 'city': city,
+// //                 'state': state,
+// //                 'address': address,
+// //                 'phone': phone,
+// //                 'image_link': image_link,
+// //                 'facebook_link': facebook_link,
+// //                 'seeking_talent': seeking_talent,
+// //                 'seeking_description': seeking_description,
+// //                 'website': website,
+// //                 'genres': genres
+// //             }),
+// //             headers: {
+// //                 'Content-Type': 'application/json',
+// //             }
+// //         })
+// //         .then(json)
+// //         .catch(function(error) {
+// //             console.log(error);
+// //         });
 
-//     fetch('/artists/create', {
-//             method: 'POST',
-//             body: JSON.stringify({
-//                 'name': name,
-//                 'city': city,
-//                 'state': state,
-//                 'address': address,
-//                 'phone': phone,
-//                 'genres': genres,
-//                 'image_link': image_link,
-//                 'facebook_link': facebook_link
-//             }),
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             }
-//         })
-//         .then(response => response.json())
-//         .then(jsonResponse => {
-//             console.log(jsonResponse);
-//         })
-//         .catch(function(e) {
-//             console.log('Error occurred ');
-//         });
-// }
+// // })
 
-// //create show
-// function createShow(e) {
-//     //document.getElementById('create-show-form').onsubmit = function(e) {
-//     e.preventDefault();
-//     const venue_id = document.getElementById('venue_id').value;
-//     const artist_id = document.getElementById('artist_id').value;
-//     fetch('/shows/create', {
-//             method: 'POST',
-//             body: JSON.stringify({
-//                 'venue_id': venue_id,
-//                 'artist_id': artist_id,
-//             }),
-//             headers: {
-//                 'Content-Type': 'application/json',
-//             }
-//         })
-//         .then(response => response.json())
-//         .then(jsonResponse => {
-//             console.log(jsonResponse);
-//         })
-//         .catch(function(e) {
-//             console.log('Error occurred ');
-//         });
-// }
+// // //create show
+// // $("#createShow").on("click", function(e) {
+// //     e.preventDefault();
+// //     const venue_id = document.getElementById('venue_id').value;
+// //     const artist_id = document.getElementById('artist_id').value;
+// //     const start_time = document.getElementById('start_time').value;
 
+// //     fetch('/shows/create', {
+// //             method: 'POST',
+// //             body: JSON.stringify({
+// //                 'venue_id': venue_id,
+// //                 'artist_id': artist_id,
+// //                 'start_time': start_time
+// //             }),
+// //             headers: {
+// //                 'Content-Type': 'application/json',
+// //             }
+// //         })
+// //         .catch(function(error) {
+// //             console.log(error);
+// //         });
+// // })
 
+// //update venue
+// // $("#updateVenue").on("click", function(e) {
+// //         e.preventDefault();
+// //         const venueid = e.target.dataset['id']
+// //             // alert(venueid)
+// //         const name = document.getElementById('name').value;
+// //         const city = document.getElementById('city').value;
+// //         const state = document.getElementById('state').value;
+// //         const address = document.getElementById('address').value;
+// //         const phone = document.getElementById('phone').value;
+// //         const image_link = document.getElementById('image_link').value;
+// //         const facebook_link = document.getElementById('facebook_link').value;
+// //         const seeking_description = document.getElementById('seeking_description').value;
+// //         var seekingbox = document.getElementById('seeking_talent');
+// //         var seeking_talent = true;
+// //         if (seekingbox.checked) {
+// //             seeking_talent = true;
+// //         } else { seeking_talent = false; }
+
+// //         const website = document.getElementById('website').value;
+// //         // const genres = document.getElementById('genres').value;
+// //         var genres = [];
+// //         $("#genres :selected").each(function() {
+// //             genres.push($(this).val());
+// //         });
+// //         fetch('/venues/' + venueid + '/edit', {
+// //                 method: 'POST',
+// //                 body: JSON.stringify({
+// //                     'id': venueid,
+// //                     'name': name,
+// //                     'city': city,
+// //                     'state': state,
+// //                     'address': address,
+// //                     'phone': phone,
+// //                     'image_link': image_link,
+// //                     'facebook_link': facebook_link,
+// //                     'seeking_talent': seeking_talent,
+// //                     'seeking_description': seeking_description,
+// //                     'website': website,
+// //                     'genres': genres
+// //                 }),
+// //                 headers: {
+// //                     'Content-Type': 'application/json'
+// //                 }
+// //             })
+// //             .catch(function(error) {
+// //                 console.log(error);
+// //             });
+// //     })
 // // delete venue
-// function deleteItem(e) {
+// $("#deleteVenue").on("click", function(e) {
 //     console.log("ok " + $(e).attr("data-id"));
 //     // const venueId = e.target.dataset['id'];
 //     // fetch('/venues/' + venueId, {
@@ -129,4 +184,4 @@ $("#createVenue").on("click", function(e) {
 //     //         const item = e.target.parentElement;
 //     //         item.remove();
 //     //     })
-// }
+// })

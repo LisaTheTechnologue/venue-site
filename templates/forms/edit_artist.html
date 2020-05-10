@@ -4,6 +4,7 @@
         <h3 class="form-heading">Edit artist <em>{{ artist.name }}</em><a href="{{ url_for('index') }}" title="Back to homepage"><i class="fa fa-home pull-right"></i></a></h3>
         <div class="success hidden" id="artist-edit-msg"></div>
         <div class="error hidden">Something went wrong!</div>
+
         <div class="form-group">
             <label for="name">Name</label> {{ form.name(class_ = 'form-control', autofocus = true) }}
         </div>
@@ -23,13 +24,23 @@
         </div>
         <div class="form-group">
             <label for="genres">Genres</label>
-            <small>Ctrl+Click to select multiple</small> {{ form.genres(class_ = 'form-control', placeholder='Genres, separated by commas', id=form.state, autofocus = true) }}
+            <small>Ctrl+Click to select multiple</small> {{ form.genres(class_ = 'form-control', placeholder='Genres, separated by commas', autofocus = true) }}
         </div>
         <div class="form-group">
-            <label for="image_link">Image Link</label> {{ form.facebook_link(class_ = 'form-control', placeholder='http://', id=form.state, autofocus = true) }}
+            <label for="image_link">Image Link</label> {{ form.facebook_link(class_ = 'form-control', placeholder='http://', autofocus = true) }}
         </div>
         <div class="form-group">
-            <label for="genres">Facebook Link</label> {{ form.facebook_link(class_ = 'form-control', placeholder='http://', id=form.state, autofocus = true) }}
+            <label for="facebook_link">Facebook Link</label> {{ form.facebook_link(class_ = 'form-control', placeholder='http://', autofocus = true) }}
+        </div>
+        <div class="form-group">
+            <div class="form-group">
+                <div class="form-group">
+                    {{ form.seeking_venue(class_ = 'form-check-input', autofocus = true) }}<label for="seeking_venue">Seeking talent?</label>
+                </div>
+                <div class="form-group">
+                    {{ form.seeking_description(class_ = 'form-control', placeholder='Seeking description', autofocus = true) }}
+                </div>
+            </div>
         </div>
         <input type="submit" value="Edit Artist" class="btn btn-primary btn-lg btn-block">
     </form>
