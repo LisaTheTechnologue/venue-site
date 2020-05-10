@@ -1,22 +1,25 @@
 import datetime
 from flask_wtf import FlaskForm
 from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField,BooleanField,SubmitField,IntegerField
-from wtforms.validators import AnyOf, DataRequired, Length, Regexp, URL, ValidationError
+from wtforms.validators import AnyOf, DataRequired, Length, NumberRange, Regexp, URL, ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flask_sqlalchemy import SQLAlchemy
-
+from wtforms.fields.html5 import TelField
+from wtforms.widgets.html5 import NumberInput, TelInput
+from flask_wtf.recaptcha import widgets
 
 class ShowForm(FlaskForm):
     artist_id = IntegerField(
-        'artist_id'
+        'artist_id',widget=NumberInput(min=1),validators=[DataRequired()]
     )
     venue_id = IntegerField(
-        'venue_id'
+        'venue_id',widget=NumberInput(min=1),validators=[DataRequired()]    
     )
     start_time = DateTimeField(
         'start_time',
         validators=[DataRequired(),Regexp('(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})')],
-        default= datetime.datetime.now()
+        default= datetime.datetime.now(),
+        # render_kw={'disabled':''}
     )    
     submit = SubmitField('Save')
 
@@ -87,8 +90,8 @@ class VenueForm(FlaskForm):
     address = StringField(
         'address', validators=[DataRequired()]
     )
-    phone = StringField(
-        'phone', validators=[DataRequired(),Length(min=10,max=10,message='Enter 10 numbers'), Regexp('/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/')]
+    phone = IntegerField(
+        'phone',widget=NumberInput(min=1000000000,max=9999999999), validators=[DataRequired(),NumberRange(min=10,max=10,message="Only 10-number phone")]
     )
     image_link = StringField(
         'image_link', validators=[URL()]
@@ -104,7 +107,9 @@ class VenueForm(FlaskForm):
     facebook_link = StringField(
         'facebook_link', validators=[URL()]
     )
-    submit = SubmitField('Save')
+    submit = SubmitField('Save')    
+
+    
 
 class ArtistForm(FlaskForm):
     name = StringField(
@@ -169,8 +174,8 @@ class ArtistForm(FlaskForm):
             ('WY', 'WY'),
         ]
     )
-    phone = StringField(
-        'phone', validators=[DataRequired(),Length(min=10,max=10,message='Enter 10 numbers'),Regexp('/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/')]
+    phone = IntegerField(
+        'phone',widget=NumberInput(min=1000000000,max=9999999999), validators=[DataRequired(),NumberRange(min=10,max=10)]
     )
     image_link = StringField(
         'image_link',validators=[URL()]
@@ -180,7 +185,7 @@ class ArtistForm(FlaskForm):
         'seeking_description'
     )
     #dynamic choices 
-    genres = SelectMultipleField('genres',choices=[])
+    genres = SelectMultipleField('genres',choices=[],validators=[DataRequired()])
     website = StringField(
         'website', validators=[URL()]
     )

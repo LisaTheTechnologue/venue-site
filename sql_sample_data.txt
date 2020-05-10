@@ -1,0 +1,35 @@
+insert into venue(name,city,state) values('venue1','city1','GA');
+insert into venue(name,city,state) values('venue2','city1','AL');
+insert into venue(name,city,state) values('venue3','city1','AL');
+
+insert into artist(name) values('artist1');
+insert into artist(name) values('artist2');
+insert into artist(name) values('artist3');
+
+insert into show(venue_id,artist_id,start_time) values(1,1,'2020-09-09');
+insert into show(venue_id,artist_id,start_time) values(1,2,'2020-01-09');
+insert into show(venue_id,artist_id,start_time) values(1,2,'2021-01-09');
+
+insert into genres_venue(venue_id,genre_id) values(1,1);
+insert into genres_venue(venue_id,genre_id) values(1,2);
+insert into genres_venue(venue_id,genre_id) values(2,3);
+
+insert into genre(name) values('Alternative');
+insert into genre(name) values('Blues');
+insert into genre(name) values('Classical');
+insert into genre(name) values('Country');
+insert into genre(name) values('Electronic');
+insert into genre(name) values('Folk');
+insert into genre(name) values('Funk');
+insert into genre(name) values('Hip-Hop');
+insert into genre(name) values('Heavy Metal');
+insert into genre(name) values( 'Instrumental');
+insert into genre(name) values('Jazz');
+insert into genre(name) values('Musical Theatre');
+insert into genre(name) values('Pop');
+insert into genre(name) values('Punk');
+insert into genre(name) values('R&B');
+insert into genre(name) values('Reggae');
+insert into genre(name) values('Rock n Roll');
+insert into genre(name) values('Soul');
+insert into genre(name) values('Other');

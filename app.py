@@ -306,8 +306,8 @@ def show_venue(venue_id):
     if(q is None):
       return render_template('errors/404.html')
     else :
-      aps = db.session.query(Show.start_time,Artist.id,Artist.name,Artist.image_link).join(Artist).filter(Show.artist_id==2,Show.start_time<todays_datetime).order_by(Show.start_time).all()
-      aus = db.session.query(Show.start_time,Artist.id,Artist.name,Artist.image_link).join(Artist).filter(Show.artist_id==2,Show.start_time>=todays_datetime).order_by(Show.start_time).all()
+      aps = db.session.query(Show.start_time,Artist.id,Artist.name,Artist.image_link).join(Artist).filter(Show.venue_id==venue_id,Show.start_time<todays_datetime).order_by(Show.start_time).all()
+      aus = db.session.query(Show.start_time,Artist.id,Artist.name,Artist.image_link).join(Artist).filter(Show.venue_id==venue_id,Show.start_time>=todays_datetime).order_by(Show.start_time).all()
 
       results["id"]= q.id   
       results["name"]= q.name
@@ -401,7 +401,7 @@ def edit_venue(venue_id):
 def edit_venue_submission(venue_id):
     error = False
     body = {}    
-    try:      
+    try:    
       name = request.form['name']
       # validate name exist
       existname =  db.session.query(Venue.id).filter(Venue.name==name,Venue.id!=venue_id).first()
@@ -602,7 +602,7 @@ def search_artists():
     flash(e)
     return render_template('errors/500.html')
 
-#detailartist
+# detailartist
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
   try:
@@ -703,22 +703,23 @@ def edit_artist(artist_id):
 # posteditartist
 @app.route('/artists/<int:artist_id>/edit', methods=['POST'])
 def edit_artist_submission(artist_id):
+  print('===========')
   error = False
   body = {}    
   try:      
-    name = request.form['name']
+    name = request.form.get('name')
     # validate name exist
     existname =  db.session.query(Artist.id).filter(Artist.name=='artist1',Artist.id!=1).first()
     if existname is not None:
       flash("Artist exists.")
       return edit_artist(artist_id)      
-    city = request.form['city']
-    state = request.form['state']      
-    address = request.form['address']
-    phone = request.form['phone']
-    image_link = request.form['image_link']
-    facebook_link = request.form['facebook_link']
-    website = request.form['website']
+    city = request.form.get('city')
+    state = request.form.get('state')      
+    address = request.form.get('address')
+    phone = request.form.get('phone')
+    image_link = request.form.get('image_link')
+    facebook_link = request.form.get('facebook_link')
+    website = request.form.get('website')
     seeking_venue = request.form.get('seeking_venue')
     print(seeking_venue)
     if(seeking_venue=='y'):
@@ -726,7 +727,7 @@ def edit_artist_submission(artist_id):
     else: 
       seeking_venue = False
     print(seeking_venue)
-    seeking_description = request.form['seeking_description']
+    seeking_description = request.form.get('seeking_description')
     print(seeking_description)
     genres = request.form.getlist('genres')
     artist = Artist.query.get(artist_id)
