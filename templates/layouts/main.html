@@ -115,7 +115,11 @@
     <!--new_show start_time_picker-->
     <script>
         $(function() {
-            $('#datetimepicker1').datetimepicker();
+            $('#datetimepicker2').datetimepicker({
+                format: 'YYYY-MM-DD hh:mm:ss'
+            }).on('dp.show', function(event) {
+                $(".bootstrap-datetimepicker-widget").find('.btn[data-action="togglePeriod"]').hide();
+            });
         });
     </script>
 </body>

@@ -1,22 +1,24 @@
 import datetime
 from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField,BooleanField
-from wtforms.validators import DataRequired, AnyOf, URL
+from wtforms import StringField, SelectField, SelectMultipleField, DateTimeField,BooleanField,SubmitField,IntegerField
+from wtforms.validators import AnyOf, DataRequired, Length, Regexp, URL, ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from flask_sqlalchemy import SQLAlchemy
-    
+
+
 class ShowForm(FlaskForm):
-    artist_id = StringField(
+    artist_id = IntegerField(
         'artist_id'
     )
-    venue_id = StringField(
+    venue_id = IntegerField(
         'venue_id'
     )
     start_time = DateTimeField(
         'start_time',
-        validators=[DataRequired()],
+        validators=[DataRequired(),Regexp('(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})')],
         default= datetime.datetime.now()
-    )
+    )    
+    submit = SubmitField('Save')
 
 class VenueForm(FlaskForm):
     
@@ -86,12 +88,12 @@ class VenueForm(FlaskForm):
         'address', validators=[DataRequired()]
     )
     phone = StringField(
-        'phone'
+        'phone', validators=[DataRequired(),Length(min=10,max=10,message='Enter 10 numbers'), Regexp('/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/')]
     )
     image_link = StringField(
         'image_link', validators=[URL()]
     )
-    genres = SelectMultipleField('genres',choices=[])
+    genres = SelectMultipleField('genres',choices=[], validators=[DataRequired()])
     seeking_talent = BooleanField('seeking_talent', default='checked',false_values=(False, 'false', '',))
     seeking_description = StringField(
         'seeking_description'
@@ -102,7 +104,7 @@ class VenueForm(FlaskForm):
     facebook_link = StringField(
         'facebook_link', validators=[URL()]
     )
-    
+    submit = SubmitField('Save')
 
 class ArtistForm(FlaskForm):
     name = StringField(
@@ -168,11 +170,10 @@ class ArtistForm(FlaskForm):
         ]
     )
     phone = StringField(
-        # TODO implement validation logic for state
-        'phone', validators=[DataRequired()]
+        'phone', validators=[DataRequired(),Length(min=10,max=10,message='Enter 10 numbers'),Regexp('/\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/')]
     )
     image_link = StringField(
-        'image_link'
+        'image_link',validators=[URL()]
     )
     seeking_venue = BooleanField('seeking_talent', default='checked',false_values=(False, 'false', '',))
     seeking_description = StringField(
@@ -185,5 +186,6 @@ class ArtistForm(FlaskForm):
     )
     facebook_link = StringField(
         'facebook_link', validators=[URL()]
-    )
-# TODO IMPLEMENT NEW ARTIST FORM AND NEW SHOW FORM
+    )    
+    submit = SubmitField('Save')
+

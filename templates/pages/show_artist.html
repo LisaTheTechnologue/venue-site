@@ -1,6 +1,6 @@
 {% extends 'layouts/main.html' %} {% block title %}{{ artist.name }} | Artist{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-sm-6">
+    <div class="col-sm-4">
         <h1 class="monospace">
             {{ artist.name }}
         </h1>
@@ -24,17 +24,25 @@
             <i class="fab fa-facebook-f"></i> {% if artist.facebook_link %}<a href="{{ artist.facebook_link }}" target="_blank">{{ artist.facebook_link }}</a>{% else %}No Facebook Link{% endif %}
         </p>
         {% if artist.seeking_venue %}
-        <div class="seeking">
+        <div class="seeking text-center">
             <p class="lead">Currently seeking performance venues</p>
+            {% if venue.seeking_description %}
             <div class="description">
                 <i class="fas fa-quote-left"></i> {{ artist.seeking_venue }} <i class="fas fa-quote-right"></i>
-            </div>
+            </div> {% endif %}
         </div>
         {% else %}
         <p class="not-seeking">
             <i class="fas fa-moon"></i> Not currently seeking performance venues
         </p>
         {% endif %}
+
+        <!-- actions-->
+        <div class="col-sm-2">
+            <a href="/artists/{{artist.id}}/edit"><button class="btn btn-success" value='Edit' ><i class="fas fa-edit"></i> Edit</a></button>
+
+            <a href="/artists/{{artist.id}}/delete"><button class="btn btn-danger" value="Delete" ><i class="fas fa-trash"></i> Delete </button></a>
+        </div>
     </div>
     <div class="col-sm-6">
         <img src="{{ artist.image_link }}" alt="Venue Image" />

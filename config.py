@@ -9,3 +9,4 @@ DEBUG = True
 # Connect to the database
 SQLALCHEMY_DATABASE_URI = 'postgres://postgres:password@localhost:5432/venuesite'
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+

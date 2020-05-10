@@ -1,10 +1,11 @@
-{% extends 'layouts/main.html' %} {% block title %}Venue Details{% endblock %} {% block content %}
+{% extends 'layouts/main.html' %} {% block title %} {{ venue.name }} |Venue Details{% endblock %} {% block content %}
 <div class="row">
-    <div class="col-sm-6">
-        <!--Details-->
+    <div class="col-sm-4">
+
         <h1 class="monospace">
             {{ venue.name }}
         </h1>
+
         <p class="subtitle">
             ID: {{ venue.id }}
         </p>
@@ -28,7 +29,7 @@
             <i class="fab fa-facebook-f"></i> {% if venue.facebook_link %}<a href="{{ venue.facebook_link }}" target="_blank">{{ venue.facebook_link }}</a>{% else %}No Facebook Link{% endif %}
         </p>
         {% if venue.seeking_talent %}
-        <div class="seeking">
+        <div class="seeking text-center">
             <p class="lead">Currently seeking talent</p>
             {% if venue.seeking_description %}
             <div class="description">
@@ -40,15 +41,13 @@
             <i class="fas fa-moon"></i> Not currently seeking talent
         </p>
         {% endif %}
-
-        <!-- actions-->
-        <div class="col-sm-6 text-align">
-            <a href="/venues/{{venue.id}}/edit"><button class="btn btn-success" value='Edit' id="editVenue"><i class="fas fa-edit"></i> Edit</a></button>
-        </div>
-        <div class="col-sm-6 text-align">
-            <a href="/venues/{{venue.id}}/delete"><button class="btn btn-danger" value="Delete" ><i class="fas fa-trash"></i> Delete </button></a>
-        </div>
     </div>
+    <div class="col-sm-2 text-right">
+        <a href="/venues/{{venue.id}}/edit"><button class="btn btn-sm btn-success" value='Edit'><i class="fas fa-edit"></i></a></button>
+
+        <a href="/venues/{{venue.id}}/delete"><button class="btn btn-sm btn-danger" value="Delete" ><i class="fas fa-trash"></i></button></a>
+    </div>
+
     <div class="col-sm-6">
         <img src="{{ venue.image_link }}" alt="Venue Image" />
     </div>
@@ -63,7 +62,7 @@
                 <img src="{{ show.artist_image_link }}" alt="Show Artist Image" />
                 <h5><a href="/artists/{{ show.artist_id }}">{{ show.artist_name }}</a></h5>
                 <!-- <h6>{{ show.start_time }}</h6> -->
-                <h6>{{ show.start_time }}</h6>
+                <h6>{{ show.start_time|datetime('full') }}</h6>
             </div>
         </div>
         {% endfor %}

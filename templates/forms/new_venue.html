@@ -24,7 +24,8 @@
             <label for="phone">Phone</label> {{ form.phone(class_ = 'form-control', placeholder='xxx-xxx-xxxx', autofocus = true) }}
         </div>
         <div class="form-group">
-            <label for="genres">Genres</label> {{ form.genres(class_ = 'form-control', placeholder='Genres', autofocus = true) }}
+            <label for="genres">Genres</label>
+            <small>Ctrl+Click to select multiple</small> {{ form.genres(class_ = 'form-control', placeholder='Genres', autofocus = true) }}
         </div>
 
         <div class="form-group">
@@ -46,7 +47,7 @@
                 </div>
             </div>
         </div>
-        <input type="submit" value="Create Venue" id="createVenue" class="btn btn-primary btn-lg btn-block">
+        {{ form.submit(class_ ='btn btn-primary btn-lg btn-block')}}
     </form>
 </div>
 {% endblock %}
